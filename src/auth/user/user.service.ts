@@ -23,8 +23,8 @@ export class UserService {
     ) {}
 
     async create(createUserDto: CreateUserDto): Promise<User> {
-
         this.logger.debug(`Iniciando creación de usuario: ${createUserDto.email}`);
+
         const { roleId, ...userData } = createUserDto;
         const role = await this.roleService.findOne(roleId);
         if (!role) {
@@ -44,7 +44,7 @@ export class UserService {
         const savedUser = await this.userRepository.save(user);
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { passwordHash: _, ...userWithoutPassword } = savedUser;
-
+        // Log the successful creation of the user
         this.logger.log(`Usuario creado exitosamente con email: ${createUserDto.email}`);
         return userWithoutPassword as User;
     }

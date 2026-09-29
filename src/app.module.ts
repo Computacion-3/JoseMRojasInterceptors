@@ -6,6 +6,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { LoggerModule } from './common/logger/logger.module';
+import { TraceabilityInterceptor } from './common/interceptors/traceability.interceptor';
 @Module({
     imports: [
         ConfigModule.forRoot({ isGlobal: true }), // Load .env file and make it available globally
@@ -29,6 +30,6 @@ import { LoggerModule } from './common/logger/logger.module';
     ],
 
     controllers: [AppController],
-    providers: [AppService],
+    providers: [AppService, TraceabilityInterceptor],
 })
 export class AppModule {}

@@ -51,6 +51,10 @@ export class AppLogger implements LoggerService, OnModuleDestroy {
         // Salida formateada en consola
         console.log(formattedLog.trim());
     }
+    
+    logWithTrace(correlationId: string, level: string, message: string) {
+        this.write(level, message);
+    }
 
     onModuleDestroy() {
         if (this.logStream) {
