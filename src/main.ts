@@ -2,9 +2,15 @@ import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 
 import { AppModule } from './app.module';
+import { AppLogger } from './common/logger/logger.service';
 
 async function bootstrap() {
-    const app = await NestFactory.create(AppModule);
+    const app = await NestFactory.create(AppModule, {
+        bufferLogs: true, // Habilita el almax  cenamiento en búfer de logs    
+    });
+
+    const appLogger = app.get(AppLogger);
+    app.useLogger(appLogger); // Configura el logger globalmente
 
     app.useGlobalPipes(
         new ValidationPipe({
@@ -15,6 +21,7 @@ async function bootstrap() {
     );
 
     await app.listen(process.env.PORT ?? 3000);
+    appLogger.log('Servidor iniciado exitosamente en el puerto ' + (process.env.PORT ?? 3000));
 }
 
 bootstrap().catch((error) => {

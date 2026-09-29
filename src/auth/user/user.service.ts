@@ -10,6 +10,7 @@ import { RoleService } from '../role/role.service';
 
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import {AppLogger} from 'src/common/logger/logger.service';
 
 @Injectable()
 export class UserService {
@@ -18,9 +19,12 @@ export class UserService {
         private readonly userRepository: Repository<User>,
         private readonly roleService: RoleService,
         private readonly configService: ConfigService,
+        private readonly logger: AppLogger,
     ) {}
 
     async create(createUserDto: CreateUserDto): Promise<User> {
+
+        this.logger.debug(`Iniciando creación de usuario: ${createUserDto.email}`);
         const { roleId, ...userData } = createUserDto;
         const role = await this.roleService.findOne(roleId);
         if (!role) {
@@ -40,6 +44,8 @@ export class UserService {
         const savedUser = await this.userRepository.save(user);
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { passwordHash: _, ...userWithoutPassword } = savedUser;
+
+        this.logger.log(`Usuario creado exitosamente con email: ${createUserDto.email}`);
         return userWithoutPassword as User;
     }
 
@@ -75,6 +81,7 @@ export class UserService {
     }
 
     async update(id: number, updateUserDto: UpdateUserDto): Promise<User> {
+        this.logger.debug(`Iniciando actualización de usuario: ${id}`);
         const user = await this.findOne(id);
         const { roleId, ...userData } = updateUserDto;
 
@@ -87,12 +94,16 @@ export class UserService {
         }
 
         this.userRepository.merge(user, userData);
+        this.logger.log(`Usuario actualizado exitosamente con id: ${id}`);
         return await this.userRepository.save(user);
     }
 
     async remove(id: number): Promise<{ message: string }> {
+        this.logger.debug(`Iniciando eliminación de usuario: ${id}`);
+        
         const user = await this.findOne(id);
         await this.userRepository.remove(user);
+        this.logger.log(`Usuario eliminado exitosamente con id: ${id}`);
         return { message: `User with id #${id} deleted successfully` };
     }
 }
