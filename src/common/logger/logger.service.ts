@@ -1,7 +1,9 @@
-import { Injectable, LoggerService, OnModuleDestroy } from '@nestjs/common';
 import * as fs from 'fs';
-
 import * as path from 'path';
+
+import { Injectable, LoggerService, OnModuleDestroy } from '@nestjs/common';
+
+import { getCorrelationId } from '../trace-context';
 
 @Injectable()
 export class AppLogger implements LoggerService, OnModuleDestroy {
@@ -41,19 +43,21 @@ export class AppLogger implements LoggerService, OnModuleDestroy {
         this.write('VERBOSE', message);
     }
 
-    private write(level: string, message: string, trace?: string) {
+    private write(level: string, message: string, trace?: string, correlationId?: string) {
+        const activeCorrelationId = correlationId ?? getCorrelationId();
         const timestamp = new Date().toISOString();
-        const formattedLog = `[${timestamp}] [${level}] ${message}${trace ? '\n[Stack Trace]: ' + trace : ''}\n`;
+        const correlationSuffix = activeCorrelationId ? ` [CorrelationID: ${activeCorrelationId}]` : '';
+        const formattedLog = `[${timestamp}] [${level}] ${message}${correlationSuffix}${trace ? '\n[Stack Trace]: ' + trace : ''}\n`;
 
         // Escritura persistente en disco
         this.logStream.write(formattedLog);
 
         // Salida formateada en consola
-        console.log(formattedLog.trim());
+        console.info(formattedLog.trim());
     }
-    
-    logWithTrace(correlationId: string, level: string, message: string) {
-        this.write(level, message);
+
+    logWithTrace(correlationId: string, level: string, message: string): void {
+        this.write(level, message, undefined, correlationId);
     }
 
     onModuleDestroy() {

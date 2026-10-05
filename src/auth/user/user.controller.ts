@@ -13,8 +13,8 @@ import {
     UseInterceptors,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { CryptoInterceptor } from '../../common/interceptors/crypto.interceptor';
 
+import { CryptoInterceptor } from '../../common/interceptors/crypto.interceptor';
 import { PositiveIntPipe } from '../../common/pipes/positive-int-pipe';
 import { PermissionsGuard } from '../guards/permissions/permissions.guard';
 import { Permissions } from '../decorators/permissions.decorator';
@@ -27,7 +27,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 @Controller('user')
 export class UserController {
     @Post('sensitive-operation')
-    createSensitive(@Body() data: any) {
+    createSensitive(@Body() data: Record<string, unknown>) {
         return { success: true, received: data };
     }
     constructor(private readonly userService: UserService) {}
