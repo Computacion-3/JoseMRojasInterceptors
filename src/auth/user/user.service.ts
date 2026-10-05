@@ -4,13 +4,14 @@ import { ConfigService } from '@nestjs/config';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 
+import { AppLogger } from 'src/common/logger/logger.service';
+
 import { RoleNotFoundException, UserNotFoundException } from '../../common/exceptions';
 import { User } from '../entities/user.entity';
 import { RoleService } from '../role/role.service';
 
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import {AppLogger} from 'src/common/logger/logger.service';
 
 @Injectable()
 export class UserService {
@@ -100,7 +101,7 @@ export class UserService {
 
     async remove(id: number): Promise<{ message: string }> {
         this.logger.debug(`Iniciando eliminación de usuario: ${id}`);
-        
+
         const user = await this.findOne(id);
         await this.userRepository.remove(user);
         this.logger.log(`Usuario eliminado exitosamente con id: ${id}`);
